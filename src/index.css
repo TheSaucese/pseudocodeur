@@ -35,6 +35,9 @@ body {
   border-right: 1px solid black;
   background-color: #1E1E1E;
   position: relative;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-field {
@@ -95,5 +98,24 @@ body {
   padding: 0.75rem;
   border-radius: 0.5rem
 }
+
+.tag {
+  margin: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 6px;
+  background: #3b91ca;
+  color: #fff;
+  border-radius: 50px;
+  min-width: 1.5rem;
+  text-align: justify;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 1.5rem; 
+}
+
 
 }

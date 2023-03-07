@@ -7,6 +7,7 @@ import { fields } from "./fields";
 import Operation from "./Operation";
 import Read from "./Read";
 import Trash from "./Trash";
+import Variable from "./Variable";
 import Write from "./Write";
 
 export function SidebarField(props) {
@@ -53,12 +54,19 @@ function DraggableSidebarField(props) {
 
 export default function Sidebar(props) {
   const {overid,show,fieldsRegKey } = props;
+  const cuh = {}
 
   return (
     <div key={fieldsRegKey} className="sidebar">
+      <div>
       {show && fields.map((f) => (
         <DraggableSidebarField key={f.type} field={f} />
       ))}
+      </div>
+      <div>
+        <Variable key={'variable'} field={{type:'variable',title:'poop'}}/>
+      </div>
+
       {!show && <Trash overid={overid}/>}
     </div>
   );
