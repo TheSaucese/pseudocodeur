@@ -114,7 +114,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 1.5rem; 
+  max-height: 1.5rem;
+  cursor: pointer;
+  user-select: none; 
 }
 
 

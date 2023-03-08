@@ -10,6 +10,7 @@ import {
 import Announcements from "./announcements";
 import Canvas, { Field } from "./canvas";
 import Sidebar, { SidebarField } from "./sidebar";
+import Variable from "./Variable";
 
 function getData(prop) {
   return prop?.data?.current ?? {};
@@ -24,6 +25,12 @@ function createSpacer({ id }) {
 }
 
 export default function App() {
+  const [tags, setTags] = useState([]); // Add state hook for tags array
+
+  const handleTagsUpdate = (updatedTags) => {
+    setTags(updatedTags);
+  };
+
   const [show,setShow]=useState(true);
   const [overid,setoverid]=useState(false);
   const [sidebarFieldsRegenKey, setSidebarFieldsRegenKey] = useState(
@@ -31,6 +38,7 @@ export default function App() {
   );
   const spacerInsertedRef = useRef();
   const currentDragFieldRef = useRef();
+  const [activeVariable,setActiveVariable] = useState();
   const [activeSidebarField, setActiveSidebarField] = useState(); // only for fields from the sidebar
   const [activeField, setActiveField] = useState(); // only for fields that are in the form.
   const [data, updateData] = useImmer({
@@ -55,6 +63,7 @@ export default function App() {
     if (activeData.fromSidebar) {
       const { field } = activeData;
       const { type } = field;
+      setActiveVariable(type==="variable"?activeData:null)
       setActiveSidebarField(field);
       // Create a new field that'll be added to the fields array
       // if we drag it over the canvas.
@@ -204,6 +213,8 @@ export default function App() {
               <SidebarField overlay field={activeSidebarField} />
             ) : null}
             {activeField ? <Field overlay field={activeField} /> : null}
+            {activeVariable && <div className="tag"> {activeVariable.tag} </div>}  
+            {console.log(activeVariable)}
           </DragOverlay>
         </DndContext>
       </div>

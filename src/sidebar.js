@@ -1,6 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { nanoid } from "nanoid";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Declare from "./Declare";
 
 import { fields } from "./fields";
@@ -54,7 +54,12 @@ function DraggableSidebarField(props) {
 
 export default function Sidebar(props) {
   const {overid,show,fieldsRegKey } = props;
-  const cuh = {}
+  const [tags, setTags] = useState([]); // Add state hook for tags array
+
+  const handleTagsUpdate = (updatedTags) => {
+    setTags(updatedTags);
+  };
+
 
   return (
     <div key={fieldsRegKey} className="sidebar">
@@ -64,7 +69,7 @@ export default function Sidebar(props) {
       ))}
       </div>
       <div>
-        <Variable key={'variable'} field={{type:'variable',title:'poop'}}/>
+      {show && <Variable onTagsUpdate={handleTagsUpdate} tags={tags} key={'variable'} field={{type:'variable',title:'cool variable'}}/>}  
       </div>
 
       {!show && <Trash overid={overid}/>}

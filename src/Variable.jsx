@@ -2,23 +2,12 @@ import { useDraggable } from "@dnd-kit/core";
 import React, { useRef, useState } from "react";
 import { nanoid } from "nanoid";
 
-export default function Variable(props) {
-  const { field, ...rest } = props;
-
-  const id = useRef(nanoid());
-
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: id.current,
-    data: {
-      field,
-      fromSidebar: true
-    }
-  });
+function Variable(props) {
+  const { field, tags, onTagsUpdate } = props; // Use tags prop and onTagsUpdate prop
 
   const ENTER = 13;
   const COMMA = 188;
   const BACKSPACE = 8;
-  const [tags, setTags] = useState([]);
   const [value, setValue] = useState("");
 
   const handleKeyUp = (e) => {
@@ -38,18 +27,23 @@ export default function Variable(props) {
   const addTag = () => {
     let tag = value.trim().replace(/,/g, "");
     if (!tag) return;
-    setTags([...tags, tag]);
+    let updatedTags = [...tags, tag];
+    onTagsUpdate(updatedTags); // Call callback function to update parent prop
     setValue("");
   };
 
-  const editTag = () => setValue(tags.pop());
+  const editTag = () => {
+    let newTags = [...tags];
+    setValue(newTags.pop());
+    onTagsUpdate(newTags); // Call callback function to update parent prop
+  };
 
   return (
     <div 
     className="">
         <input
           type="text"
-          placeholder="Add tag..."
+          placeholder="Ajouter une variable..."
           autoFocus
           className="w-full"
           value={value}
@@ -58,16 +52,38 @@ export default function Variable(props) {
           onKeyDown={handleKeyDown}
         />
       <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes} 
       className="flex flex-wrap">
         {tags.map((tag, index) => (
-          <div key={index} className="tag">
-            {tag}
-          </div>
+          <Taggers field={field} tag={tag} index={index}/>
         ))}
       </div>
     </div>
   );
 }
+
+export default React.memo(Variable);
+function Taggers(props) {
+
+  const { field,tag,index } = props;
+
+  const id = useRef(nanoid());
+
+  const { attributes, listeners, setNodeRef, } = useDraggable({
+    id: id.current,
+    data: {
+      field,
+      tag,
+      fromSidebar: true
+    }
+  });
+
+  return <div
+    ref={setNodeRef}
+    {...listeners}
+    {...attributes}
+    key={index}
+    className="tag">
+    {tag}
+  </div>;
+}
+
