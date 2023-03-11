@@ -4,23 +4,32 @@ import { useSortable } from "@dnd-kit/sortable";
 
 import { renderers } from "./fields";
 
-function getRenderer(type) {
+function getRenderer(type, variables) {
   if (type === "spacer") {
     return () => {
       return <div className="spacer">spacer</div>;
     };
   }
 
-  return renderers[type] || (() => <div>No renderer found for {type}</div>);
+  const renderer = renderers[type];
+
+  if (renderer) {
+    return () => renderer({ variables });
+  }
+
+  return () => <div>No renderer found for {type}</div>;
 }
 
+
+
 export function Field(props) {
-  const { field, overlay, ...rest } = props;
+  const { field, overlay, variables, id, ...rest } = props;
   const { type } = field;
 
-  const Component = getRenderer(type);
+  const Component = getRenderer(type,variables);
 
   let className = "canvas-field";
+  
   if (overlay) {
     className += " overlay";
   }
@@ -33,7 +42,7 @@ export function Field(props) {
 }
 
 function SortableField(props) {
-  const { id, index, field } = props;
+  const { id, index, field, variables } = props;
 
   const {
     attributes,
@@ -57,13 +66,13 @@ function SortableField(props) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Field field={field} />
+      <Field field={field} variables={variables} id={id} />
     </div>
   );
 }
 
 export default function Canvas(props) {
-  const { fields } = props;
+  const { fields,variables } = props;
 
   const {
     attributes,
@@ -96,9 +105,9 @@ export default function Canvas(props) {
     <div>début</div>
     <div className='bg-[#805bb8] shadow-inner min-w-[64rem] min-h-[32rem] ml-3 rounded-md'>
     <div className="canvas-fields">
-        {fields?.map((f, i) => (
-          <SortableField key={f.id} id={f.id} field={f} index={i} />
-        ))}
+      {fields?.map((f, i) => {
+          return <SortableField key={f.id} id={f.id} field={f} variables={variables} index={i} />
+        })} 
       </div>
     </div>
     <div>fin</div>

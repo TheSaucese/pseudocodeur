@@ -25,8 +25,11 @@ export const fields = [
 
 // These define how we render the field
 export const renderers = {
-  declare: () => <Declare/>,
-  operation: () => <Operation/>,
-  lire: () => <Read/>,
-  ecrire: () => <Write/>,
+  declare: ({ variables }) => <Declare variables={variables} />,
+  operation: () => <Operation />,
+  lire: () => <Read />,
+  ecrire: () => <Write />,
 };
+
+
+

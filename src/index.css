@@ -119,5 +119,9 @@ body {
   user-select: none; 
 }
 
+.tag-spacer {
+  background: #1E1E1E;
+}
+
 
 }

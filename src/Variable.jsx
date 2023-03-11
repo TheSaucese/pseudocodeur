@@ -54,7 +54,7 @@ function Variable(props) {
       <div
       className="flex flex-wrap">
         {tags.map((tag, index) => (
-          <Taggers field={field} tag={tag} index={index}/>
+          <Taggers field={field} tag={tag} index={index} key={index}/>
         ))}
       </div>
     </div>
