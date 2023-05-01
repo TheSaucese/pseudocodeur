@@ -7,6 +7,7 @@ import { fields } from "./fields";
 import Operation from "./Operation";
 import Read from "./Read";
 import Trash from "./Trash";
+import Type from "./Type";
 import Variable from "./Variable";
 import Write from "./Write";
 
@@ -56,6 +57,24 @@ export default function Sidebar(props) {
   const {overid,show,fieldsRegKey } = props;
   const [tags, setTags] = useState([]); // Add state hook for tags array
 
+  const OperationType = [
+    {
+      type: "+",
+    },
+    {
+      type: "lire",
+  
+    },
+    {
+      type: "ecrire",
+      
+    },
+    {
+      type: "operation",
+    
+    },
+  ];
+
   const handleTagsUpdate = (updatedTags) => {
     setTags(updatedTags);
   };
@@ -68,6 +87,9 @@ export default function Sidebar(props) {
         <DraggableSidebarField key={f.type} field={f} />
       ))}
       </div>
+      {show && fields.map((f) => (
+        <Type key={f.type} field={f} />
+      ))}
       <div>
       {show && <Variable onTagsUpdate={handleTagsUpdate} tags={tags} key={'variable'} field={{type:'variable',title:'cool variable'}}/>}  
       </div>

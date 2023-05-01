@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useImmer } from "use-immer";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import {
@@ -15,19 +15,24 @@ function getData(prop) {
   return prop?.data?.current ?? {};
 }
 
-function createSpacer({ id,parentid }) {
+function createSpacer({ id,parentID,ParentType,Position, deltaX }) {
   return {
     id,
     type: "spacer",
     title: "spacer",
-    parentID : parentid
+    ParentType,
+    parentID : parentID,
+    Position,
+    deltaX
   };
 }
 
 export default function App() {
 
   const [show,setShow]=useState(true);
+  const [pos,setPos]=useState(0);
   const [overid,setoverid]=useState(false);
+  const [lastOverID,setLastOverID]=useState(false);
   const [sidebarFieldsRegenKey, setSidebarFieldsRegenKey] = useState(
     Date.now()
   );
@@ -113,7 +118,8 @@ export default function App() {
   };
 
   const handleDragOver = (e) => {
-    const { active, over } = e;
+    const { active, over, delta } = e;
+    console.log(delta)
     const activeData = getData(active);
 
     // Once we detect that a sidebar field is being moved over the canvas
@@ -171,13 +177,15 @@ export default function App() {
           });
         }
       }
-      else if (over?.id!="canvas_droppable") {
-        console.log(over)
+      else if (over?.id!=="canvas_droppable") {
+        setLastOverID(over?.id);
         if (!spacerInsertedRef.current) {
-          console.log("holyshit")
           const spacer = createSpacer({
             id: active.id + "-spacer",
-            parentid : over.id
+            parentID : over?.id,
+            ParentType : over?.data.current.field.type,
+            Position : (delta.x>1048?"right":"left"),
+            deltaX: pos
           });
           updateDataVar((draft) => {
             if (!draft.variables.length) {
@@ -198,7 +206,29 @@ export default function App() {
             draft.variables = draft.variables.filter((f) => f.type !== "spacer");
           });
           spacerInsertedRef.current = false;
-        } else {
+        } else if (over?.id!==lastOverID) {
+          console.log("amogus")
+          updateDataVar((draft) => {
+            draft.variables = draft.variables.filter((f) => f.type !== "spacer");
+          });
+          spacerInsertedRef.current = false;
+          const spacer = createSpacer({
+            id: active.id + "-spacer",
+            parentID : over?.id
+          });
+          updateDataVar((draft) => {
+            if (!draft.variables.length) {
+              draft.variables.push(spacer);
+            } else {
+              const nextIndex =
+                overData.index > -1 ? overData.index : draft.variables.length;
+
+              draft.variables.splice(nextIndex, 0, spacer);
+            }
+            spacerInsertedRef.current = true;
+          });
+        } 
+        else {
           console.log("maybe here ??")
           // Since we're still technically dragging the sidebar draggable and not one of the sortable draggables
           // we need to make sure we're updating the spacer position to reflect where our drop will occur.
@@ -224,7 +254,7 @@ export default function App() {
   };
 
   const handleDragEnd = (e) => {
-    const { active, over } = e;
+    const { active, over, delta } = e;
     const activeData = getData(active);
     const { field } = activeData;
     const { type } = field;
@@ -234,6 +264,9 @@ export default function App() {
       cleanUp();
       updateData((draft) => {
         draft.fields = draft.fields.filter((f) => f.type !== "spacer");
+      });
+      updateDataVar((draft) => {
+        draft.variables = draft.variables.filter((f) => f.parentID !== field.id);
       });
       setShow(true);
       return;
@@ -261,19 +294,22 @@ export default function App() {
     }
     else if (type==="variable") {
       const overData = getData(over);
+      var Index,Pos,Type;
 
       updateDataVar((draft) => {
         const spacerIndex = draft.variables.findIndex((f) => f.type === "spacer");
+        Pos = draft.variables[spacerIndex].Position;
+        Type = draft.variables[spacerIndex].ParentType;
+        Index=spacerIndex;
+        console.log("spacer",spacerIndex)
         draft.variables.splice(spacerIndex, 1, nextField);
-        draft.variables = arrayMove(
-          draft.variables,
-          spacerIndex,
-          overData.index || 0
-        );
+        draft.variables = arrayMove(draft.variables,spacerIndex,overData.index || 0);
       });
       updateDataVar((draft) => {
-        const lastVarIndex = draft.variables.length - 1;
-        draft.variables[lastVarIndex].parentId = over.id;
+        const lastVarIndex = Index;
+        draft.variables[lastVarIndex].parentID = over.id;
+        draft.variables[lastVarIndex].Position = delta.x>1048?"right":"left";
+        draft.variables[lastVarIndex].ParentType = Type;
       });
     }
 
@@ -306,6 +342,7 @@ export default function App() {
               <SidebarField overlay field={activeSidebarField} />
             ) : null}
             {activeField ? <Field overlay field={activeField} /> : null}
+          
             {activeVariable && !activeField && <div className="tag"> {activeVariable.tag} </div>}  
           </DragOverlay>
         </DndContext>

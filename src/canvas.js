@@ -14,7 +14,12 @@ function getRenderer(type, variables,id) {
   const renderer = renderers[type];
 
   if (renderer) {
-    return () => renderer({ variables,id });
+    const props = { variables };
+
+    if (id) {
+      props.id = id;
+    }
+    return () => renderer(props);
   }
 
   return () => <div>No renderer found for {type}</div>;
@@ -25,7 +30,7 @@ function getRenderer(type, variables,id) {
 export function Field(props) {
   const { field, overlay, variables, id, ...rest } = props;
   const { type } = field;
-
+  
   const Component = getRenderer(type,variables,id);
 
   let className = "canvas-field";
@@ -65,7 +70,7 @@ function SortableField(props) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef}  style={style} {...attributes} {...listeners}>
       <Field field={field} variables={variables} id={id} />
     </div>
   );
@@ -103,7 +108,7 @@ export default function Canvas(props) {
     >
       <div className='bg-[#9579c0] m-auto rounded-md space-y-5 p-3 w-fit'>
     <div>début</div>
-    <div className='bg-[#805bb8] shadow-inner min-w-[64rem] min-h-[32rem] ml-3 rounded-md'>
+    <div className='bg-[#805bb8] shadow-inner min-w-[5rem]  min-h-[3.25rem] ml-3 rounded-md'>
     <div className="canvas-fields">
       {fields?.map((f, i) => {
           return <SortableField key={f.id} id={f.id} field={f} variables={variables} index={i} />
