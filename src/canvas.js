@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 
 import { renderers } from "./fields";
 
-function getRenderer(type, variables) {
+function getRenderer(type, variables,id) {
   if (type === "spacer") {
     return () => {
       return <div className="spacer">spacer</div>;
@@ -14,7 +14,7 @@ function getRenderer(type, variables) {
   const renderer = renderers[type];
 
   if (renderer) {
-    return () => renderer({ variables });
+    return () => renderer({ variables,id });
   }
 
   return () => <div>No renderer found for {type}</div>;
@@ -26,7 +26,7 @@ export function Field(props) {
   const { field, overlay, variables, id, ...rest } = props;
   const { type } = field;
 
-  const Component = getRenderer(type,variables);
+  const Component = getRenderer(type,variables,id);
 
   let className = "canvas-field";
   

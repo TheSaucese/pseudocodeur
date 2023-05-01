@@ -15,11 +15,12 @@ function getData(prop) {
   return prop?.data?.current ?? {};
 }
 
-function createSpacer({ id }) {
+function createSpacer({ id,parentid }) {
   return {
     id,
     type: "spacer",
-    title: "spacer"
+    title: "spacer",
+    parentID : parentid
   };
 }
 
@@ -96,9 +97,11 @@ export default function App() {
     setActiveField(field);
     currentDragFieldRef.current = field;
     const { type } = field;
+    // when you drag from canvas
     if(type==="variable") {
+      console.log("here's the thing ")
       updateDataVar((draft) => {
-        draft.variables.splice(index, 1, createSpacer({ id: active.id }));
+        draft.variables.splice(index, 1, createSpacer({ id: active.id, }));
       });
     }
     else {
@@ -168,23 +171,13 @@ export default function App() {
           });
         }
       }
-      else {
-        if (overData.id !== undefined) {
-          updateData(draft => {
-            const daschosen = draft.fields.find(field => field.id === overData.id)
-            if (daschosen) {
-              if (!daschosen.id.includes('spacer')) { // Check if daschosen id already contains 'spacer'
-                daschosen.id = `${daschosen.id}-spacer`
-              }
-            }
-          })
-        }
-        
-        
-        
+      else if (over?.id!="canvas_droppable") {
+        console.log(over)
         if (!spacerInsertedRef.current) {
+          console.log("holyshit")
           const spacer = createSpacer({
-            id: active.id + "-spacer"
+            id: active.id + "-spacer",
+            parentid : over.id
           });
           updateDataVar((draft) => {
             if (!draft.variables.length) {
@@ -198,6 +191,7 @@ export default function App() {
             spacerInsertedRef.current = true;
           });
         } else if (!over) {
+          console.log("or here??/")
           // This solves the issue where you could have a spacer handing out in the canvas if you drug
           // a sidebar item on and then off
           updateDataVar((draft) => {
@@ -205,22 +199,23 @@ export default function App() {
           });
           spacerInsertedRef.current = false;
         } else {
+          console.log("maybe here ??")
           // Since we're still technically dragging the sidebar draggable and not one of the sortable draggables
           // we need to make sure we're updating the spacer position to reflect where our drop will occur.
           // We find the spacer and then swap it with the over skipping the op if the two indexes are the same
-          updateData((draft) => {
-            const spacerIndex = draft.fields.findIndex(
+          updateDataVar((draft) => {
+            const spacerIndex = draft.variables.findIndex(
               (f) => f.id === active.id + "-spacer"
             );
 
             const nextIndex =
-              overData.index > -1 ? overData.index : draft.fields.length - 1;
+              overData.index > -1 ? overData.index : draft.variables.length - 1;
 
             if (nextIndex === spacerIndex) {
               return;
             }
 
-            draft.fields = arrayMove(draft.fields, spacerIndex, overData.index);
+            draft.variables = arrayMove(draft.variables, spacerIndex, overData.index);
           });
         }
       }
@@ -275,6 +270,10 @@ export default function App() {
           spacerIndex,
           overData.index || 0
         );
+      });
+      updateDataVar((draft) => {
+        const lastVarIndex = draft.variables.length - 1;
+        draft.variables[lastVarIndex].parentId = over.id;
       });
     }
 
