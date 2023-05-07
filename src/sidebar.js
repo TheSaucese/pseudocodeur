@@ -13,15 +13,15 @@ import Write from "./Write";
 
 export function SidebarField(props) {
   const { field, overlay } = props;
-  const { title } = field;
+  const { title,subtype } = field;
 
   let className = "sidebar-field";
   if (overlay) {
     className += " overlay";
   }
   switch(title){
-    case 'Declarer' : return <Declare className={className}/>
-    case 'Operation' : return <Operation className={className}/>
+    case 'Declarer' : return <Declare className={className} subtype={subtype}/>
+    case 'Operation' : return <Operation className={className} subtype={subtype}/>
     case 'Lire' : return <Read className={className}/>
     case 'Ecrire' : return <Write className={className}/>
     default : return 

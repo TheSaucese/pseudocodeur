@@ -1,26 +1,20 @@
 import { useDraggable } from "@dnd-kit/core";
 import { nanoid } from "nanoid";
-import { useRef, useState } from "react";
-import Declare from "./Declare";
+import { useRef } from "react";
 
 export function OpType(props) {
   const { field, overlay } = props;
-
+  
   let className = "sidebar-field";
   if (overlay) {
     className += " overlay";
   }
-  switch(title){
-    case 'Declarer' : return <Declare className={className}/>
-    case 'Operation' : return <Operation className={className}/>
-    case 'Lire' : return <Read className={className}/>
-    case 'Ecrire' : return <Write className={className}/>
-    default : return 
-    }
+  
 }
 
 export default function Type(props) {
   const { field, ...rest } = props;
+ 
 
   const id = useRef(nanoid());
 

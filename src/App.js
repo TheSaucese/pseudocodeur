@@ -10,6 +10,7 @@ import {
 import Announcements from "./announcements";
 import Canvas, { Field } from "./canvas";
 import Sidebar, { SidebarField } from "./sidebar";
+import { Output } from "./Output";
 
 function getData(prop) {
   return prop?.data?.current ?? {};
@@ -59,6 +60,7 @@ export default function App() {
   const handleDragStart = (e) => {
     const { active } = e;
     const activeData = getData(active);
+    console.log("active is",active)
     
 
     // This is where the cloning starts.
@@ -67,7 +69,7 @@ export default function App() {
     // in the onDragEnd handler.
     if (activeData.fromSidebar) {
       const { field } = activeData;
-      const { type } = field;
+      const { type,subtype } = field;
       setActiveVariable(type==="variable"?activeData:null)
       setActiveSidebarField(field);
       // Create a new field that'll be added to the fields array
@@ -86,7 +88,8 @@ export default function App() {
           id: active.id,
           type,
           name: `${type}${fields.length + 1}`,
-          parent: null
+          parent: null,
+          subtype: subtype
         };
       }
       return;
@@ -335,7 +338,11 @@ export default function App() {
             strategy={verticalListSortingStrategy}
             items={fields.map((f) => f.id)}
           >
-            <Canvas fields={fields} variables={variables} />
+              <div className="flex flex-col w-full">
+                <Canvas fields={fields} variables={variables} />
+                <Output/>
+              </div>
+
           </SortableContext>
           <DragOverlay  dropAnimation={false}>
             {activeSidebarField ?  (
@@ -346,6 +353,7 @@ export default function App() {
             {activeVariable && !activeField && <div className="tag"> {activeVariable.tag} </div>}  
           </DragOverlay>
         </DndContext>
+       
       </div>
     </div>
   );

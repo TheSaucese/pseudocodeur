@@ -4,7 +4,8 @@ import { useSortable } from "@dnd-kit/sortable";
 
 import { renderers } from "./fields";
 
-function getRenderer(type, variables,id) {
+function getRenderer(type, variables,id,subtype) {
+  console.log("renderere subtype : ",subtype)
   if (type === "spacer") {
     return () => {
       return <div className="spacer">spacer</div>;
@@ -14,10 +15,14 @@ function getRenderer(type, variables,id) {
   const renderer = renderers[type];
 
   if (renderer) {
-    const props = { variables };
+    const props = { variables};
 
     if (id) {
       props.id = id;
+    }
+
+    if (subtype) {
+      props.subtype = subtype;
     }
     return () => renderer(props);
   }
@@ -29,9 +34,9 @@ function getRenderer(type, variables,id) {
 
 export function Field(props) {
   const { field, overlay, variables, id, ...rest } = props;
-  const { type } = field;
+  const { type,subtype } = field;
   
-  const Component = getRenderer(type,variables,id);
+  const Component = getRenderer(type,variables,id,subtype);
 
   let className = "canvas-field";
   
@@ -48,7 +53,6 @@ export function Field(props) {
 
 function SortableField(props) {
   const { id, index, field, variables } = props;
-
   const {
     attributes,
     listeners,
@@ -68,6 +72,8 @@ function SortableField(props) {
     transform: CSS.Transform.toString(transform),
     transition
   };
+
+  console.log("field is",field)
 
   return (
     <div ref={setNodeRef}  style={style} {...attributes} {...listeners}>
